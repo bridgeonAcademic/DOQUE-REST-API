@@ -26,8 +26,6 @@ const chatSchema: Schema<IChat> = new Schema({
       sender: { type: Schema.Types.ObjectId, ref: "user", required: true },
     },
   ],
-  createdAt: { type: Date, required: true },
-  updatedAt: { type: Date, required: true },
 });
 
 const Chat = mongoose.model<IChat>("Chat", chatSchema);
