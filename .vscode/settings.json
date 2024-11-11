@@ -1,7 +1,3 @@
 {
-	"editor.defaultFormatter": "biomejs.biome",
-	"cSpell.words": ["signin", "Signup"],
-	"[jsonc]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	}
+	"editor.defaultFormatter": "biomejs.biome"
 }
