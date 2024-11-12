@@ -12,4 +12,10 @@ const registerSchema = z.object({
 	password: z.string().min(4),
 });
 
-export { loginSchema, registerSchema };
+const workspaceSchema = z.object({
+	name: z.string(),
+	description: z.string().optional(),
+	visibility: z.string().optional(),
+});
+
+export { loginSchema, registerSchema, workspaceSchema };
