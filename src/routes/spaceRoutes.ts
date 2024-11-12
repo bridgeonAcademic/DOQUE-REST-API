@@ -9,14 +9,25 @@ import {
   getSpaceById,
   updateSpaceById,
 } from "../controllers/spaceController";
+import { verifyToken } from "../middlewares/verifyToken";
 
 const router = express.Router();
 
 //Space routes
-router.post("/", validateData(spaceSchema), errorCatch(createSpace));
-router.get("/", errorCatch(getAllSpaces));
-router.get("/:id", errorCatch(getSpaceById));
-router.put("/:id", validateData(spaceSchema), errorCatch(updateSpaceById));
-router.delete("/:id", errorCatch(deleteSpaceById));
+router.post(
+  "/",
+  verifyToken,
+  validateData(spaceSchema),
+  errorCatch(createSpace)
+);
+router.get("/", verifyToken, errorCatch(getAllSpaces));
+router.get("/:id", verifyToken, errorCatch(getSpaceById));
+router.put(
+  "/:id",
+  verifyToken,
+  validateData(spaceSchema),
+  errorCatch(updateSpaceById)
+);
+router.delete("/:id", verifyToken, errorCatch(deleteSpaceById));
 
 export default router;
