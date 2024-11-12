@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
+import { globalErrorHandler } from "./middlewares/globalErrorHandler";
+import authRoutes from "./routes/authRoutes";
 
 const app = express();
 
@@ -13,6 +15,9 @@ app.use(express.json());
 app.get("/", (_req, res) => {
   res.send("Hello World!");
 });
+
+app.use("/auth", authRoutes);
+app.use(globalErrorHandler);
 
 mongoose
   .connect(process.env.MONGO_URI || "")
