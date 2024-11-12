@@ -6,6 +6,7 @@ export interface IUser extends Document {
 	email: string;
 	password: string;
 	verified: boolean;
+	isBlocked: boolean;
 }
 
 const userSchema: Schema = new Schema(
