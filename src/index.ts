@@ -18,7 +18,7 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/auth", authRoutes);
-app.use("/auth", adminRoutes);
+app.use("/admin", adminRoutes);
 app.use(globalErrorHandler);
 
 mongoose

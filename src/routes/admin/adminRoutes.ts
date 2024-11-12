@@ -3,12 +3,20 @@ import { errorCatch } from "../../utils/error/errorCatch";
 import { validateData } from "../../middlewares/zodValidation";
 import { adminLoginSchema } from "../../utils/zodSchemas";
 import { adminLogin } from "../../controllers/admin/adminAuthController";
-import { getAllUsers } from "../../controllers/admin/adminController";
+import {
+	blockUser,
+	getAllUsers,
+	getAllWorkspacesWithSpaces,
+	getWorkspaceById,
+} from "../../controllers/admin/adminController";
 import { adminAuthenticate } from "../../middlewares/admin/adminAuthenticate";
 
 const router = express.Router();
 
-router.post("/admin/login", validateData(adminLoginSchema), errorCatch(adminLogin));
-router.get("/admin/users", adminAuthenticate, errorCatch(getAllUsers));
+router.post("/login", validateData(adminLoginSchema), errorCatch(adminLogin));
+router.get("/users", adminAuthenticate, errorCatch(getAllUsers));
+router.patch("/blockuser/:userId", adminAuthenticate, errorCatch(blockUser));
+router.get("/workspaces", adminAuthenticate, errorCatch(getAllWorkspacesWithSpaces));
+router.get("/workspace/:workspaceId", adminAuthenticate, errorCatch(getWorkspaceById));
 
 export default router;
