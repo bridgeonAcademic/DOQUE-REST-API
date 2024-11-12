@@ -12,4 +12,9 @@ const registerSchema = z.object({
 	password: z.string().min(4),
 });
 
-export { loginSchema, registerSchema };
+const adminLoginSchema = z.object({
+	email: z.string().email(),
+	password: z.string().min(6),
+});
+
+export { loginSchema, registerSchema, adminLoginSchema };
