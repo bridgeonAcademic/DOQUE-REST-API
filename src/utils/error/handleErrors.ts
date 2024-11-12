@@ -13,14 +13,6 @@ const duplicateKeyErrorHandler = (err: {
   const field = Object.keys(err.keyValue)[0];
   const value = err.keyValue[field];
 
-  if (field === "email") {
-    return new CustomError("This email is already exists ", 400);
-  }
-
-  if (field === "username") {
-    return new CustomError("Username is already taken!", 400);
-  }
-
   return new CustomError(`${value} already exists!`, 400);
 };
 

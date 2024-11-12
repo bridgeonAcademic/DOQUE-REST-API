@@ -12,10 +12,15 @@ const registerSchema = z.object({
   password: z.string().min(4),
 });
 
+const otpSchema = z.object({
+  email: z.string().email(),
+  otp: z.string(),
+});
+
 const spaceSchema = z.object({
   name: z.string().min(3),
   description: z.string().optional(),
   workspaceId: z.string().optional(),
 });
 
-export { loginSchema, registerSchema, spaceSchema };
+export { loginSchema, registerSchema, otpSchema, spaceSchema };
