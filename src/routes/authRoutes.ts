@@ -1,5 +1,5 @@
 import express from "express";
-import { login, register, reSendOtp, verifyOtp } from "../controllers/authController";
+import { forgotPassword, login, register, reSendOtp, resetPassword, verifyOtp } from "../controllers/authController";
 import { errorCatch } from "../utils/error/errorCatch";
 import { validateData } from "../middlewares/zodValidation";
 import { loginSchema, otpSchema, registerSchema } from "../utils/zodSchemas";
@@ -11,5 +11,7 @@ router.post("/register", validateData(registerSchema), errorCatch(register));
 router.post("/login", validateData(loginSchema), errorCatch(login));
 router.post("/verifyotp", validateData(otpSchema), errorCatch(verifyOtp));
 router.post("/resendotp", errorCatch(reSendOtp));
+router.post("/forgotpassword", errorCatch(forgotPassword));
+router.post("/resetpassword/:token", errorCatch(resetPassword));
 
 export default router;

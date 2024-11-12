@@ -123,6 +123,16 @@ const verifyOtp = async (req: Request, res: Response) => {
 		throw new CustomError("Email not found", 400);
 	}
 
+	// Check if OTP is expired
+	const currentTime = new Date().getTime();
+	const otpUpdatedTime = new Date(otpDoc.updatedAt).getTime();
+	const timeDifference = (currentTime - otpUpdatedTime) / 1000 / 60;
+
+	if (timeDifference > 10) {
+		// 10 minutes
+		throw new CustomError("OTP expired", 400);
+	}
+
 	if (otp !== otpDoc.otp) {
 		throw new CustomError("Invalid OTP", 400);
 	}
@@ -179,7 +189,78 @@ const reSendOtp = async (req: Request, res: Response) => {
 		await newOtp.save();
 	}
 
-	res.status(200).json(new StandardResponse("Otp send successfully!", {}));
+	res.status(200).json(
+		new StandardResponse("Otp send successfully!", {
+			email,
+		}),
+	);
 };
 
-export { register, login, reSendOtp, verifyOtp };
+// forgot password
+const forgotPassword = async (req: Request, res: Response) => {
+	const { email } = req.body;
+
+	if (!email) throw new CustomError("Email is required", 400);
+
+	const user = await User.findOne({ email });
+
+	if (!user) {
+		throw new CustomError("User not found", 400);
+	}
+
+	const resetToken = jwt.sign(
+		{
+			id: user._id,
+		},
+		process.env.JWT_SECRET_KEY || "",
+		{
+			expiresIn: "10m",
+		},
+	);
+
+	mailSender(
+		email,
+		"Reset your password",
+		`
+	<div style="font-family: Arial, sans-serif; text-align: center;">
+	  <h2>Reset your password</h2>
+	  <p>Please click on the following link to reset your password:</p>
+	  <a href="${process.env.CLIENT_URL}/reset-password/${resetToken}">Reset password</a>
+	  <p>expires in 10 minutes</p>
+	  <p>Don't share this link with anyone!! </p>
+	  <p>Thank you!</p>
+	</div>
+	`,
+	);
+
+	res.status(200).json(new StandardResponse("Reset link sent successfully!"));
+};
+
+// reset the password using the token
+const resetPassword = async (req: Request, res: Response) => {
+	const token = req.params.token;
+
+	if (!token) throw new CustomError("Invalid token", 400);
+
+	const { newPassword } = req.body;
+
+	if (!newPassword) throw new CustomError("New Password is required", 400);
+
+	const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || "") as { id: string };
+	console.log(decoded);
+
+	const user = await User.findById(decoded.id);
+
+	if (!user) {
+		throw new CustomError("User not found", 400);
+	}
+
+	const saltRounds = Number(process.env.SALT_ROUNDS || "10");
+	const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+	await user.updateOne({ password: hashedPassword });
+
+	res.status(200).json(new StandardResponse("Password reset successfully!"));
+};
+
+export { register, login, reSendOtp, verifyOtp, forgotPassword, resetPassword };

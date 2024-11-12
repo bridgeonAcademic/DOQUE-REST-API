@@ -3,6 +3,7 @@ import { type Document, model, Schema } from "mongoose";
 interface IOtp extends Document {
 	email: string;
 	otp: string;
+	updatedAt: Date;
 }
 
 const otpSchema: Schema<IOtp> = new Schema(
