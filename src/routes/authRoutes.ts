@@ -1,13 +1,15 @@
 import express from "express";
-import { login, register } from "../controllers/authController";
+import { login, register, reSendOtp, verifyOtp } from "../controllers/authController";
 import { errorCatch } from "../utils/error/errorCatch";
 import { validateData } from "../middlewares/zodValidation";
-import { loginSchema, registerSchema } from "../utils/zodSchemas";
+import { loginSchema, otpSchema, registerSchema } from "../utils/zodSchemas";
 
 const router = express.Router();
 
 //Register user
 router.post("/register", validateData(registerSchema), errorCatch(register));
 router.post("/login", validateData(loginSchema), errorCatch(login));
+router.post("/verifyotp", validateData(otpSchema), errorCatch(verifyOtp));
+router.post("/resendotp", errorCatch(reSendOtp));
 
 export default router;

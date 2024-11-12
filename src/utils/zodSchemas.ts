@@ -12,4 +12,9 @@ const registerSchema = z.object({
 	password: z.string().min(4),
 });
 
-export { loginSchema, registerSchema };
+const otpSchema = z.object({
+	email: z.string().email(),
+	otp: z.string(),
+});
+
+export { loginSchema, registerSchema, otpSchema };
