@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import Workspace from "../models/workspaceModel";
 import { StandardResponse } from "../utils/standardResponse";
 import { CustomError } from "../utils/error/customError";
-import Space from "../models/spaceModel";
+import mailSender from "../utils/mailSender";
 
 export const createWorkspace = async (req: Request, res: Response) => {
 	const { name, description, visibility } = req.body;
@@ -115,4 +115,40 @@ export const acceptInvitation = async (req: Request, res: Response) => {
 	}
 
 	res.status(200).json(new StandardResponse("accepted invitation", updatedWorkspace));
+};
+
+export const inviteMember = async (req: Request, res: Response) => {
+	const { email } = req.body;
+	const { workspaceId } = req.params;
+
+	const workspace = await Workspace.findById(workspaceId);
+
+	if (!workspace) {
+		throw new CustomError("Workspace not found", 404);
+	}
+
+	await sendInvitationEmail(email, workspaceId);
+
+	res.status(200).json(new StandardResponse(`Invitation sent to ${email} successfully.`, { email, workspaceId }));
+};
+
+const sendInvitationEmail = async (email: string, workspaceId: string) => {
+	const workspace = await Workspace.findById(workspaceId);
+
+	if (!workspace) {
+		throw new CustomError("Workspace not found", 404);
+	}
+
+	const title = "Invitation to Join Workspace";
+	const body = `
+			<h2>Hello,</h2>
+			<p>You have been invited to join the workspace: <strong>${workspace.name}</strong>.</p>
+			<p>Click the link below to accept the invitation:</p>
+			<a href="${process.env.CLIENT_URL}/${workspaceId}/accept-invitation" style="padding: 10px 15px; color: white; background-color: #007bff; border-radius: 5px; text-decoration: none;">Accept Invitation</a>
+			<p>If you didn't request this invitation, please ignore this email.</p>
+			<p>Best Regards,</p>
+			<p>Team DOQUE</p>
+		`;
+	const info = await mailSender(email, title, body);
+	return info;
 };

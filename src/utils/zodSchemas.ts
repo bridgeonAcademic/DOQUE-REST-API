@@ -38,4 +38,17 @@ const workspaceSchema = z.object({
 	visibility: z.string().optional(),
 });
 
-export { loginSchema, registerSchema, otpSchema, spaceSchema, adminLoginSchema, chatSchema, workspaceSchema };
+const inviteSchema = z.object({
+	email: z.string().email(),
+});
+
+export {
+	loginSchema,
+	registerSchema,
+	otpSchema,
+	spaceSchema,
+	adminLoginSchema,
+	chatSchema,
+	workspaceSchema,
+	inviteSchema,
+};
