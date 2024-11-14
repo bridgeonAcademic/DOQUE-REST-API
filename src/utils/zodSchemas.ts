@@ -12,4 +12,8 @@ const registerSchema = z.object({
 	password: z.string().min(4),
 });
 
-export { loginSchema, registerSchema };
+const chatSchema = z.object({
+	content: z.string().min(1)
+})
+
+export { loginSchema, registerSchema, chatSchema };

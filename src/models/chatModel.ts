@@ -7,23 +7,23 @@ interface IMessage {
 }
 
 interface IChat extends Document {
-  workspaceId: Types.ObjectId;
+  workspace: Types.ObjectId;
   messages: IMessage[];
   createdAt: Date;
   updatedAt: Date;
 }
 
 const chatSchema: Schema<IChat> = new Schema({
-  workspaceId: {
+  workspace: {
     type: Schema.Types.ObjectId,
-    ref: "workspace",
+    ref: "Workspace",
     required: true,
   },
   messages: [
     {
       content: { type: String, required: true },
       timestamp: { type: Date, required: true },
-      sender: { type: Schema.Types.ObjectId, ref: "user", required: true },
+      sender: { type: Schema.Types.ObjectId, ref: "User", required: true },
     },
   ],
 });
