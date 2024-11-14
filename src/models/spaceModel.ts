@@ -4,9 +4,8 @@ interface ISpace extends Document {
 	workspaceId: Types.ObjectId;
 	name: string;
 	description?: string;
-	lists: Types.ObjectId[];
+	lists: Schema.Types.ObjectId[];
 }
-
 const spaceSchema: Schema<ISpace> = new Schema(
 	{
 		workspaceId: {
@@ -16,10 +15,9 @@ const spaceSchema: Schema<ISpace> = new Schema(
 		},
 		name: { type: String, required: true },
 		description: { type: String },
-		lists: [{ type: Schema.Types.ObjectId, ref: "lists", required: true }],
+		lists: [{ type: Schema.Types.ObjectId, ref: "lists", optional: true }],
 	},
 	{ timestamps: true },
 );
 
-const Space = mongoose.model<ISpace>("Space", spaceSchema);
-export default Space;
+export const Space = mongoose.model<ISpace>("Space", spaceSchema);

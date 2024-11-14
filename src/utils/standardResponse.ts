@@ -4,9 +4,9 @@ export class StandardResponse {
 	status: string;
 	message: string;
 	// biome-ignore lint/suspicious/noExplicitAny:
-	data: any;
+	data?: any;
 	// biome-ignore lint/suspicious/noExplicitAny: response data can be any type
-	constructor(message: string, data: any, statusCode = 200) {
+	constructor(message: string, data?: any, statusCode = 200) {
 		this.statusCode = statusCode;
 		this.status = "success";
 		this.message = message;
