@@ -28,4 +28,8 @@ const adminLoginSchema = z.object({
 	password: z.string().min(6),
 });
 
-export { loginSchema, registerSchema, otpSchema, spaceSchema, adminLoginSchema };
+const chatSchema = z.object({
+	content: z.string().min(1),
+});
+
+export { loginSchema, registerSchema, otpSchema, spaceSchema, adminLoginSchema, chatSchema };
