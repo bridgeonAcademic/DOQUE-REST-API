@@ -4,8 +4,9 @@ import mongoose from "mongoose";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 import authRoutes from "./routes/authRoutes";
 import spaceRoutes from "./routes/spaceRoutes";
-import listRoutes from "./routes/listRoutes";
 import adminRoutes from "./routes/admin/adminRoutes";
+import chatRoutes from "./routes/chatRoutes";
+import searchRoutes from "./routes/searchRoutes";
 
 const app = express();
 
@@ -21,8 +22,9 @@ app.get("/", (_req, res) => {
 
 app.use("/auth", authRoutes);
 app.use("/space", spaceRoutes);
-app.use("/space", listRoutes);
 app.use("/admin", adminRoutes);
+app.use("/chat", chatRoutes);
+app.use("/search", searchRoutes);
 app.use(globalErrorHandler);
 
 mongoose
