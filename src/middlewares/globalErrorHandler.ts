@@ -7,6 +7,7 @@ const errorResponse = (error: CustomError, res: Response) => {
 		status: error.status,
 		statusCode: error.statusCode,
 		message: error.message,
+		errorCode: error.errorCode,
 	});
 };
 
