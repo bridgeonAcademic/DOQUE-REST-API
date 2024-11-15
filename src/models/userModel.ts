@@ -4,6 +4,7 @@ export interface IUser extends Document {
 	firstName: string;
 	lastName: string;
 	email: string;
+	image?: string;
 	password: string;
 	verified: boolean;
 	isBlocked: boolean;
@@ -23,6 +24,10 @@ const userSchema: Schema = new Schema(
 			type: String,
 			required: true,
 			unique: true,
+		},
+		image: {
+			type: String,
+			required: false,
 		},
 		password: {
 			type: String,

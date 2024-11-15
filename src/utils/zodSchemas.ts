@@ -32,11 +32,13 @@ const chatSchema = z.object({
 	content: z.string().min(1),
 });
 
-const workspaceSchema = z.object({
-	name: z.string(),
-	description: z.string().optional(),
-	visibility: z.string().optional(),
-});
+const workspaceSchema = z
+	.object({
+		name: z.string(),
+		description: z.string().optional(),
+		visibility: z.string().optional(),
+	})
+	.strict();
 
 const inviteSchema = z.object({
 	email: z.string().email(),

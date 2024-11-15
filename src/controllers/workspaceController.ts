@@ -1,17 +1,22 @@
 import type { Request, Response } from "express";
+import type { CustomRequest } from "../types/interfaces";
+import type { ObjectId } from "mongoose";
 import Workspace from "../models/workspaceModel";
 import { StandardResponse } from "../utils/standardResponse";
 import { CustomError } from "../utils/error/customError";
-import mailSender from "../utils/mailSender";
+import { hasAccess, sendInvitationEmail } from "../utils/workspaceUtils";
+import { User } from "../models/userModel";
 
-export const createWorkspace = async (req: Request, res: Response) => {
-	const { name, description, visibility } = req.body;
-	const userId = "6732db6df4f87f43bffbd31e";
+export const createWorkspace = async (req: CustomRequest, res: Response) => {
+	const { name, description, visibility = "private" } = req.body;
+
+	const userId = req.user?.id;
+
 	const workspace = new Workspace({
 		name,
 		description,
 		visibility,
-		members: [{ userId: userId, status: "owner" }],
+		members: [userId],
 		createdBy: userId,
 	});
 
@@ -20,72 +25,117 @@ export const createWorkspace = async (req: Request, res: Response) => {
 	res.status(201).json(new StandardResponse("workspace created successfully", workspace));
 };
 
-export const getActiveWorkspace = async (_req: Request, res: Response) => {
-	const userId = "6732db6df4f87f43bffbd31e";
+export const getActiveWorkspaces = async (req: CustomRequest, res: Response) => {
+	const userId = req.user?.id;
 
-	const workspace = await Workspace.find({ createdBy: userId });
+	console.log(userId);
 
-	if (!workspace) {
-		throw new CustomError("No active workspace", 404);
-	}
+	const workspaces = await Workspace.find({
+		"members.userId": userId,
+	});
 
-	res.status(200).json(new StandardResponse("fetched active workspace successfully", workspace));
+	const memberWorkspaces = workspaces.filter((workspace) =>
+		workspace.members.some((member) => member.toString() === userId),
+	);
+
+	const pendingWorkspaces = workspaces.filter((workspace) =>
+		workspace.pendingMembers.some((member) => member.toString() === userId),
+	);
+
+	res.status(200).json(
+		new StandardResponse("fetched active workspaces successfully", {
+			memberWorkspaces,
+			pendingWorkspaces,
+		}),
+	);
 };
 
-export const getWorkspaceById = async (req: Request, res: Response) => {
+export const getWorkspaceById = async (req: CustomRequest, res: Response) => {
 	const { id } = req.params;
 
 	const workspace = await Workspace.findById(id);
 
 	if (!workspace) {
-		throw new CustomError("No active workspace", 404);
+		throw new CustomError("Workspace not found", 404);
 	}
+
+	if (workspace.visibility === "private") await hasAccess(workspace, req.user?.id || "");
 
 	res.status(200).json(new StandardResponse("fetched workspace successfully", workspace));
 };
 
-export const updateWorkspace = async (req: Request, res: Response) => {
+export const updateWorkspace = async (req: CustomRequest, res: Response) => {
 	const { id } = req.params;
+
 	const updateWorkspace = req.body;
 
-	const workspace = await Workspace.findByIdAndUpdate(id, { $set: updateWorkspace }, { new: true });
+	const workspace = await Workspace.findById(id);
 
 	if (!workspace) {
 		throw new CustomError("Workspace not found", 404);
 	}
 
-	res.status(200).json(new StandardResponse("Updated workspace successfully", workspace));
+	await hasAccess(workspace, req.user?.id || "");
+
+	const updated = await workspace.updateOne({ $set: updateWorkspace }, { new: true });
+
+	res.status(200).json(new StandardResponse("Updated workspace successfully", updated));
 };
 
-export const deleteWorkspace = async (req: Request, res: Response) => {
+export const deleteWorkspace = async (req: CustomRequest, res: Response) => {
 	const { id } = req.params;
 
 	//here also deleting the space , list and task
 
-	const workspace = await Workspace.findByIdAndDelete(id);
+	const workspace = await Workspace.findById(id);
 
 	if (!workspace) {
 		throw new CustomError("Workspace not found", 404);
 	}
 
-	res.status(204).json(new StandardResponse("Deleted workspace successfully", {}));
+	await hasAccess(workspace, req.user?.id || "");
+
+	await workspace.deleteOne();
+
+	res.status(204).json(new StandardResponse("Deleted workspace successfully"));
 };
 
 export const getInvitedMembers = async (req: Request, res: Response) => {
 	const { id } = req.params;
-	const workspace = await Workspace.findById(id).populate("members.userId");
+	const workspace = await Workspace.findById(id).populate("members", "_id firstName lastName image email");
 
 	if (!workspace) {
 		throw new CustomError("Workspace not found", 404);
 	}
 
-	const members = workspace.members.filter((member) => member.status !== "pending");
+	const members = workspace.members;
 
-	res.status(200).json(new StandardResponse("Fetched members successfully", members));
+	const pendingMembers = workspace.pendingMembers;
+
+	res.status(200).json(new StandardResponse("Fetched members successfully", { members, pendingMembers }));
 };
 
-export const acceptInvitation = async (req: Request, res: Response) => {
-	const userId = "6733105ddf0de189dc9866d9";
+export const acceptInvitation = async (req: CustomRequest, res: Response) => {
+	const { id } = req.params;
+	const userId = req.user?.id;
+	const workspace = await Workspace.findById(id);
+
+	if (!workspace) {
+		throw new CustomError("Workspace not found", 404);
+	}
+
+	const user = await User.findById(userId);
+	const member = workspace.pendingMembers.find((member) => member === user?.email);
+
+	if (!member) throw new CustomError("User was not invited to the workspace or invitation already accepted", 400);
+
+	workspace.members.push(user?.id);
+	await workspace.save();
+	res.status(200).json(new StandardResponse("Accepted invitation", workspace));
+};
+
+export const inviteMember = async (req: Request, res: Response) => {
+	const { email } = req.body;
 	const { id } = req.params;
 
 	const workspace = await Workspace.findById(id);
@@ -94,61 +144,14 @@ export const acceptInvitation = async (req: Request, res: Response) => {
 		throw new CustomError("Workspace not found", 404);
 	}
 
-	const memberExists = workspace.members.some((member) => member.userId && member.userId.toString() === userId);
+	const alreadyInvited = workspace.pendingMembers.includes(email);
+	if (alreadyInvited) throw new CustomError("User already invited", 400);
 
-	if (memberExists) {
-		throw new CustomError("User is already a member of the workspace", 400);
-	}
+	workspace.pendingMembers.push(email);
+	await sendInvitationEmail(email, workspace);
+	await workspace.save();
 
-	const updatedWorkspace = await Workspace.findByIdAndUpdate(
-		id,
-		{
-			$addToSet: {
-				members: { userId, status: "member" },
-			},
-		},
-		{ new: true },
-	).populate("members.userId");
+	console.log(alreadyInvited);
 
-	if (!updatedWorkspace) {
-		throw new CustomError("Error updating workspace", 500);
-	}
-
-	res.status(200).json(new StandardResponse("accepted invitation", updatedWorkspace));
-};
-
-export const inviteMember = async (req: Request, res: Response) => {
-	const { email } = req.body;
-	const { workspaceId } = req.params;
-
-	const workspace = await Workspace.findById(workspaceId);
-
-	if (!workspace) {
-		throw new CustomError("Workspace not found", 404);
-	}
-
-	await sendInvitationEmail(email, workspaceId);
-
-	res.status(200).json(new StandardResponse(`Invitation sent to ${email} successfully.`, { email, workspaceId }));
-};
-
-const sendInvitationEmail = async (email: string, workspaceId: string) => {
-	const workspace = await Workspace.findById(workspaceId);
-
-	if (!workspace) {
-		throw new CustomError("Workspace not found", 404);
-	}
-
-	const title = "Invitation to Join Workspace";
-	const body = `
-			<h2>Hello,</h2>
-			<p>You have been invited to join the workspace: <strong>${workspace.name}</strong>.</p>
-			<p>Click the link below to accept the invitation:</p>
-			<a href="${process.env.CLIENT_URL}/${workspaceId}/accept-invitation" style="padding: 10px 15px; color: white; background-color: #007bff; border-radius: 5px; text-decoration: none;">Accept Invitation</a>
-			<p>If you didn't request this invitation, please ignore this email.</p>
-			<p>Best Regards,</p>
-			<p>Team DOQUE</p>
-		`;
-	const info = await mailSender(email, title, body);
-	return info;
+	res.status(200).json(new StandardResponse(`Invitation sent to ${email} successfully.`, { email, workspaceId: id }));
 };
