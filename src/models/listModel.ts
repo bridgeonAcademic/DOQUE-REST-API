@@ -10,16 +10,20 @@ interface IList extends Document {
 	updatedAt: Date;
 }
 
-const listsSchema: Schema<IList> = new Schema(
-	{
-		spaceId: { type: Schema.Types.ObjectId, ref: "space", required: true },
-		name: { type: String, required: true },
-		description: { type: String },
-		color: { type: [String] },
-		task: [{ type: Schema.Types.ObjectId, ref: "task" }],
-	},
-	{ timestamps: true },
-);
+const listsSchema: Schema<IList> = new Schema({
+	spaceId: { type: Schema.Types.ObjectId, ref: "space", required: true },
+	name: { type: String, required: true },
+	description: { type: String },
+	color: { type: String },
+	task: [{ type: Schema.Types.ObjectId, ref: "task" }],
+	createdAt: { type: Date, default: Date.now(), required: true },
+	updatedAt: { type: Date, default: Date.now(), required: true },
+});
+
+listsSchema.pre("save", function (next) {
+	this.updatedAt = new Date();
+	next();
+});
 
 const List = mongoose.model<IList>("List", listsSchema);
 export default List;

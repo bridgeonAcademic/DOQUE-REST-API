@@ -15,7 +15,7 @@ const spaceSchema: Schema<ISpace> = new Schema(
 		},
 		name: { type: String, required: true },
 		description: { type: String },
-		lists: [{ type: Schema.Types.ObjectId, ref: "lists", optional: true }],
+		lists: [{ type: Schema.Types.ObjectId, ref: "List", optional: true }],
 	},
 	{ timestamps: true },
 );

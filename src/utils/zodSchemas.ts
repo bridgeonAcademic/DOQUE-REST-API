@@ -23,6 +23,14 @@ const spaceSchema = z.object({
 	workspaceId: z.string().optional(),
 });
 
+const listSchema = z.object({
+	name: z.string().min(3, "List name must be at least 3 characters"),
+	description: z.string().optional(),
+	color: z.string().optional(),
+	task: z.array(z.string()).optional(),
+	spaceId: z.string().optional(),
+});
+
 const adminLoginSchema = z.object({
 	email: z.string().email(),
 	password: z.string().min(6),
@@ -49,6 +57,7 @@ export {
 	registerSchema,
 	otpSchema,
 	spaceSchema,
+	listSchema,
 	adminLoginSchema,
 	chatSchema,
 	workspaceSchema,
