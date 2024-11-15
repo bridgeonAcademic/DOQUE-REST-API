@@ -7,7 +7,7 @@ import spaceRoutes from "./routes/spaceRoutes";
 import adminRoutes from "./routes/admin/adminRoutes";
 import chatRoutes from "./routes/chatRoutes";
 import searchRoutes from "./routes/searchRoutes";
-
+import workspaceRoutes from "./routes/workspaceRoutes";
 const app = express();
 
 dotenv.config();
@@ -25,6 +25,8 @@ app.use("/space", spaceRoutes);
 app.use("/admin", adminRoutes);
 app.use("/chat", chatRoutes);
 app.use("/search", searchRoutes);
+app.use("/workspace", workspaceRoutes);
+
 app.use(globalErrorHandler);
 
 mongoose
