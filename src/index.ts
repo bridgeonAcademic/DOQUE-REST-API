@@ -24,6 +24,7 @@ app.use("/space", spaceRoutes);
 app.use("/admin", adminRoutes);
 app.use("/chat", chatRoutes);
 app.use("/workspace", workspaceRoutes);
+
 app.use(globalErrorHandler);
 
 mongoose
