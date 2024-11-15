@@ -1,6 +1,6 @@
 import type { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import type { CustomRequest } from "../../types/interfaces";
+import type { CustomRequest, JwtDecoded } from "../../types/interfaces";
 import { CustomError } from "../../utils/error/customError";
 
 export const adminAuthenticate = (req: CustomRequest, res: Response, next: NextFunction): void => {
@@ -12,7 +12,7 @@ export const adminAuthenticate = (req: CustomRequest, res: Response, next: NextF
 	}
 
 	try {
-		const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || "") as jwt.JwtPayload;
+		const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || "") as JwtDecoded;
 
 		if (decoded.role !== "admin") {
 			throw new CustomError("Access denied. Admins only.", 403);
@@ -21,8 +21,7 @@ export const adminAuthenticate = (req: CustomRequest, res: Response, next: NextF
 		req.user = decoded;
 
 		next();
-		// biome-ignore lint/correctness/noUnusedVariables: <explanation>
 	} catch (error) {
-		res.status(401).json({ message: "Invalid or expired token" });
+		next(error);
 	}
 };

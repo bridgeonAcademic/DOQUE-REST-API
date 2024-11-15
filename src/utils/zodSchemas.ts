@@ -32,4 +32,25 @@ const chatSchema = z.object({
 	content: z.string().min(1),
 });
 
-export { loginSchema, registerSchema, otpSchema, spaceSchema, adminLoginSchema, chatSchema };
+const workspaceSchema = z
+	.object({
+		name: z.string(),
+		description: z.string().optional(),
+		visibility: z.string().optional(),
+	})
+	.strict();
+
+const inviteSchema = z.object({
+	email: z.string().email(),
+});
+
+export {
+	loginSchema,
+	registerSchema,
+	otpSchema,
+	spaceSchema,
+	adminLoginSchema,
+	chatSchema,
+	workspaceSchema,
+	inviteSchema,
+};
