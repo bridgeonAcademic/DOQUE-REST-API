@@ -78,6 +78,22 @@ export const getWorkspaceById = async (req: CustomRequest, res: Response) => {
 				as: "spaces",
 			},
 		},
+		{
+			$lookup: {
+				from: "users",
+				localField: "members",
+				foreignField: "_id",
+				as: "memberDetails",
+				pipeline: [
+					{
+						$project: {
+							password: 0,
+							__v: 0,
+						},
+					},
+				],
+			},
+		},
 	]);
 
 	if (!workspaceWithSpaces.length) {
