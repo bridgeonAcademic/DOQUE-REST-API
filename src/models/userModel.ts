@@ -28,6 +28,10 @@ const userSchema: Schema = new Schema(
 			type: String,
 			required: true,
 		},
+		phoneNumber: {
+			type: String,
+			required: false,
+		},
 		verified: {
 			type: Boolean,
 			default: false,

@@ -7,6 +7,7 @@ import spaceRoutes from "./routes/spaceRoutes";
 import adminRoutes from "./routes/admin/adminRoutes";
 import chatRoutes from "./routes/chatRoutes";
 import searchRoutes from "./routes/searchRoutes";
+import userRoutes from "./routes/userRoutes";
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use("/space", spaceRoutes);
 app.use("/admin", adminRoutes);
 app.use("/chat", chatRoutes);
 app.use("/search", searchRoutes);
+app.use(userRoutes);
 app.use(globalErrorHandler);
 
 mongoose

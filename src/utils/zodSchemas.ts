@@ -14,7 +14,8 @@ const registerSchema = z.object({
 const editUserDetails = z.object({
 	firstName: z.string().min(3),
 	lastName: z.string().optional(),
-	email: z.string().email(),
+	phoneNumber: z.string().optional(),
+	image: z.string().optional(),
 });
 
 const otpSchema = z.object({
@@ -37,4 +38,4 @@ const chatSchema = z.object({
 	content: z.string().min(1),
 });
 
-export { loginSchema, registerSchema, otpSchema, spaceSchema, adminLoginSchema, chatSchema };
+export { loginSchema, registerSchema, otpSchema, spaceSchema, editUserDetails, adminLoginSchema, chatSchema };
