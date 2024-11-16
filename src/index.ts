@@ -9,6 +9,7 @@ import chatRoutes from "./routes/chatRoutes";
 import searchRoutes from "./routes/searchRoutes";
 import listRoutes from "./routes/listRoutes";
 import taskRoutes from "./routes/taskRoutes";
+import userRoutes from "./routes/userRoutes";
 import workspaceRoutes from "./routes/workspaceRoutes";
 const app = express();
 
@@ -19,7 +20,7 @@ const port = process.env.PORT || 3001;
 app.use(express.json());
 
 app.get("/", (_req, res) => {
-	res.send("Hello World!");
+  res.send("Hello World!");
 });
 
 app.use("/auth", authRoutes);
@@ -27,17 +28,18 @@ app.use("/space", spaceRoutes, listRoutes, taskRoutes);
 app.use("/admin", adminRoutes);
 app.use("/chat", chatRoutes);
 app.use("/search", searchRoutes);
+app.use(userRoutes);
 app.use("/workspace", workspaceRoutes);
 
 app.use(globalErrorHandler);
 
 mongoose
-	.connect(process.env.MONGO_URI || "")
-	.then(() => {
-		app.listen(port, () => {
-			console.log(`Server is running on port ${port}`);
-		});
-	})
-	.catch((err) => {
-		console.error(err);
-	});
+  .connect(process.env.MONGO_URI || "")
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error(err);
+  });
