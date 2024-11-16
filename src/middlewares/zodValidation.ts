@@ -9,7 +9,7 @@ export function validateData(schema: AnyZodObject) {
 			next();
 		} catch (error) {
 			if (error instanceof ZodError) {
-				throw new CustomError("Invalid data", 400);
+				throw new CustomError(`Invalid data, ${error.errors[0].path}: ${error.errors[0].message}`, 400);
 			}
 			throw new CustomError("Error when validating data", 400);
 		}
