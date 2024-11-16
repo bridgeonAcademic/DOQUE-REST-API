@@ -11,12 +11,6 @@ const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(4),
 });
-const editUserDetails = z.object({
-  firstName: z.string().min(3),
-  lastName: z.string().optional(),
-  phoneNumber: z.string().optional(),
-  image: z.string().optional(),
-});
 
 const otpSchema = z.object({
   email: z.string().email(),
@@ -46,6 +40,13 @@ const chatSchema = z.object({
   content: z.string().min(1),
 });
 
+const editUserDetails = z.object({
+  firstName: z.string().min(3),
+  lastName: z.string().optional(),
+  phoneNumber: z.string().optional(),
+  image: z.string().optional(),
+});
+
 const workspaceSchema = z
   .object({
     name: z.string(),
@@ -68,4 +69,5 @@ export {
   chatSchema,
   workspaceSchema,
   inviteSchema,
+  editUserDetails,
 };
