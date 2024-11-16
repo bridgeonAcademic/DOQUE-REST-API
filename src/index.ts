@@ -7,6 +7,8 @@ import spaceRoutes from "./routes/spaceRoutes";
 import adminRoutes from "./routes/admin/adminRoutes";
 import chatRoutes from "./routes/chatRoutes";
 import searchRoutes from "./routes/searchRoutes";
+import listRoutes from "./routes/listRoutes";
+import taskRoutes from "./routes/taskRoutes";
 import workspaceRoutes from "./routes/workspaceRoutes";
 const app = express();
 
@@ -21,7 +23,7 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/auth", authRoutes);
-app.use("/space", spaceRoutes);
+app.use("/space", spaceRoutes, listRoutes, taskRoutes);
 app.use("/admin", adminRoutes);
 app.use("/chat", chatRoutes);
 app.use("/search", searchRoutes);

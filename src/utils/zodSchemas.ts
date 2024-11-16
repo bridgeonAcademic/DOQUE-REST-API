@@ -19,15 +19,14 @@ const otpSchema = z.object({
 
 const spaceSchema = z.object({
 	name: z.string().min(3),
+	workspaceId: z.string(),
 	description: z.string().optional(),
-	workspaceId: z.string().optional(),
 });
 
 const listSchema = z.object({
 	name: z.string().min(3, "List name must be at least 3 characters"),
 	description: z.string().optional(),
 	color: z.string().optional(),
-	task: z.array(z.string()).optional(),
 	spaceId: z.string().optional(),
 });
 
