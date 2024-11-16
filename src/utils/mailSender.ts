@@ -2,6 +2,8 @@ import nodemailer from "nodemailer";
 import { CustomError } from "./error/customError";
 
 const mailSender = async (email: string, title: string, body: string) => {
+	console.log(process.env.MAIL_USER);
+
 	try {
 		// Create a Transporter to send emails
 		const transporter = nodemailer.createTransport({
