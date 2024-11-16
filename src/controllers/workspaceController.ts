@@ -27,23 +27,17 @@ export const createWorkspace = async (req: CustomRequest, res: Response) => {
 export const getActiveWorkspaces = async (req: CustomRequest, res: Response) => {
 	const userId = req.user?.id;
 
-	console.log(userId);
-
-	const workspaces = await Workspace.find({
-		"members.userId": userId,
+	const activeWorkspaces = await Workspace.find({
+		members: { $in: [userId] },
 	});
 
-	const memberWorkspaces = workspaces.filter((workspace) =>
-		workspace.members.some((member) => member.toString() === userId),
-	);
-
-	const pendingWorkspaces = workspaces.filter((workspace) =>
-		workspace.pendingMembers.some((member) => member.toString() === userId),
-	);
+	const pendingWorkspaces = await Workspace.find({
+		pendingMembers: { $in: [userId] },
+	});
 
 	res.status(200).json(
 		new StandardResponse("fetched active workspaces successfully", {
-			memberWorkspaces,
+			activeWorkspaces,
 			pendingWorkspaces,
 		}),
 	);
