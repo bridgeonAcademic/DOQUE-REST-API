@@ -5,7 +5,8 @@ import { CustomError } from "../utils/error/customError";
 
 //create a new space
 export const createSpace = async (req: Request, res: Response) => {
-	const { name, description, workspaceId } = req.body;
+	const { name, description } = req.body;
+	const { workspaceId } = req.query;
 
 	const newSpace = new Space({
 		name,

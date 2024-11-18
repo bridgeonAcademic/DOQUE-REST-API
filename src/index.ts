@@ -1,12 +1,14 @@
 import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
+import cors from "cors";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 import authRoutes from "./routes/authRoutes";
 import spaceRoutes from "./routes/spaceRoutes";
 import adminRoutes from "./routes/admin/adminRoutes";
 import chatRoutes from "./routes/chatRoutes";
 import searchRoutes from "./routes/searchRoutes";
+import userRoutes from "./routes/userRoutes";
 import workspaceRoutes from "./routes/workspaceRoutes";
 const app = express();
 
@@ -19,13 +21,15 @@ app.use(express.json());
 app.get("/", (_req, res) => {
 	res.send("Hello World!");
 });
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
-app.use("/auth", authRoutes);
-app.use("/space", spaceRoutes);
-app.use("/admin", adminRoutes);
-app.use("/chat", chatRoutes);
-app.use("/search", searchRoutes);
-app.use("/workspace", workspaceRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/space", spaceRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/search", searchRoutes);
+app.use(userRoutes);
+app.use("/api/workspace", workspaceRoutes);
 
 app.use(globalErrorHandler);
 
