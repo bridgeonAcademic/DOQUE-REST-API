@@ -1,12 +1,13 @@
 import type { Request, Response } from "express";
 import { CustomError } from "../utils/error/customError";
+import type { CustomRequest } from "../types/interfaces";
 import { StandardResponse } from "../utils/standardResponse";
 import Chat from "../models/chatModel";
 
-export const createMessages = async (req: Request, res: Response) => {
+export const createMessages = async (req: CustomRequest, res: Response) => {
 	const { workspaceId } = req.params;
 	const { content } = req.body;
-	const userId = "6733105ddf0de189dc9866d9";
+	const userId = req.user?.id;
 
 	if (!workspaceId) {
 		throw new CustomError("Workspace not found", 400);
@@ -42,9 +43,9 @@ export const getMessages = async (req: Request, res: Response) => {
 export const deleteChat = async (req: Request, res: Response) => {
 	const { workspaceId } = req.params;
 
-	const cleartChat = await Chat.deleteMany({ workspace: workspaceId });
+	const clearChat = await Chat.deleteMany({ workspace: workspaceId });
 
-	if (!cleartChat) {
+	if (!clearChat) {
 		throw new CustomError("Message not found", 404);
 	}
 

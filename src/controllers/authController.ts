@@ -17,8 +17,6 @@ const register = async (req: Request, res: Response) => {
 
 	const existingUser = await User.findOne({ email });
 
-	const image = "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png";
-
 	if (existingUser) {
 		if (!existingUser.verified) throw new CustomError("User already exists but not verified", 400, "USER_NOT_VERIFIED");
 
@@ -29,7 +27,6 @@ const register = async (req: Request, res: Response) => {
 		firstName,
 		lastName,
 		email,
-		image,
 		password: hashedPassword,
 	});
 	await user.save();
@@ -261,7 +258,6 @@ const resetPassword = async (req: Request, res: Response) => {
 	const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || "") as {
 		id: string;
 	};
-	console.log(decoded);
 
 	const user = await User.findById(decoded.id);
 

@@ -12,6 +12,6 @@ router.post("/login", validateData(loginSchema), errorCatch(login));
 router.post("/verifyotp", validateData(otpSchema), errorCatch(verifyOtp));
 router.post("/resendotp", errorCatch(reSendOtp));
 router.post("/forgotpassword", errorCatch(forgotPassword));
-router.post("/resetpassword/:token", errorCatch(resetPassword));
+router.patch("/resetpassword/:token", errorCatch(resetPassword));
 
 export default router;

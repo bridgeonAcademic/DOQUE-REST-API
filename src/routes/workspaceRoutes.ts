@@ -23,8 +23,8 @@ router.get("/", errorCatch(getActiveWorkspaces));
 router.get("/:id", errorCatch(getWorkspaceById));
 router.put("/:id", validateData(workspaceSchema), errorCatch(updateWorkspace));
 router.delete("/:id", errorCatch(deleteWorkspace));
-router.get("/:id/invited-members", errorCatch(getInvitedMembers));
-router.patch("/:id/accept-invitation", errorCatch(acceptInvitation));
 router.post("/:id/invite", validateData(inviteSchema), errorCatch(inviteMember));
+router.patch("/:id/accept-invitation", errorCatch(acceptInvitation));
+router.get("/:id/invited-members", errorCatch(getInvitedMembers));
 
 export default router;

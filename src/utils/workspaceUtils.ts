@@ -2,8 +2,13 @@ import type { IWorkspace } from "../models/workspaceModel";
 import { CustomError } from "./error/customError";
 import mailSender from "./mailSender";
 
-export const hasAccess = async (workspace: IWorkspace, userId: string) => {
+export const hasAccess = async (workspace: IWorkspace, userId: string, role: "owner" | "user" = "user") => {
 	// to find if the user is a member of the workspace. If not, throw an error
+
+	if (role === "owner" && workspace.createdBy.toString() !== userId) {
+		throw new CustomError("You do not have permission to do this!", 403);
+	}
+
 	if (workspace.members.every((member) => member.toString() !== userId)) {
 		throw new CustomError("You are not a member of this workspace", 403);
 	}
