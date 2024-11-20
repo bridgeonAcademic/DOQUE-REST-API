@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { string, z } from "zod";
 
 const loginSchema = z.object({
   email: z.string(),
@@ -19,7 +19,6 @@ const otpSchema = z.object({
 
 const spaceSchema = z.object({
   name: z.string().min(3),
-  workspaceId: z.string(),
   description: z.string().optional(),
 });
 
@@ -61,18 +60,17 @@ const inviteSchema = z.object({
 const createTasksSchema = z.object({
   title: z.string().min(3, "Task name must be at least 3 characters"),
   description: z.string().optional(),
-  listId: z.string(),
-  dueDate: z.date().optional(),
+  dueDate: z.string().optional(),
   priority: z.string().optional(),
-  assignedTo: z.string().optional(),
+  assignedTo: z.array(z.string()).optional(),
 });
 const updateTaskSchema = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
-  listId: z.string(),
-  dueDate: z.date().optional(),
+  listId: z.string().optional(),
+  dueDate: z.string().optional(),
   priority: z.string().optional(),
-  assignedTo: z.string().optional(),
+  assignedTo: z.array(z.string()).optional(),
 });
 
 export {

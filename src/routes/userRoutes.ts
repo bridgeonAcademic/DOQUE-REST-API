@@ -7,12 +7,7 @@ import { validateData } from "../middlewares/zodValidation";
 
 const router = express.Router();
 
-router.get("/userprofile/:userId", verifyToken, errorCatch(getUserById));
-router.put(
-  "/userprofile/:userId",
-  verifyToken,
-  validateData(editUserDetails),
-  errorCatch(updatedUserProfile)
-);
+router.get("/:userId", verifyToken, errorCatch(getUserById));
+router.put("/:userId", verifyToken, validateData(editUserDetails), errorCatch(updatedUserProfile));
 
 export default router;

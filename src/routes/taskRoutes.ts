@@ -5,7 +5,7 @@ import { createTasksSchema, updateTaskSchema } from "../utils/zodSchemas";
 import {
   createTask,
   deleteTask,
-  getAllTasks,
+  getTaskById,
   moveTask,
   updateTask,
 } from "../controllers/taskController";
@@ -16,9 +16,9 @@ const router = Router();
 router.use(verifyToken);
 
 router.get(
-  "/:spaceId/lists/:listId/tasks",
+  "/:spaceId/lists/:listId/tasks/:taskId",
   verifyToken,
-  errorCatch(getAllTasks)
+  errorCatch(getTaskById)
 );
 
 router.post(

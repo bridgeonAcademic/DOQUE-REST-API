@@ -9,6 +9,7 @@ export const createList = async (req: Request, res: Response) => {
 	const { name, description, color, task } = req.body;
 
 	const space = await Space.findById(spaceId);
+
 	if (!space) {
 		throw new CustomError("space not found", 404);
 	}
@@ -21,7 +22,7 @@ export const createList = async (req: Request, res: Response) => {
 		task: task || [],
 	});
 
-	await newList.save();
+	await Promise.all([newList.save(), space.updateOne({ $push: { lists: newList._id } })]);
 
 	res.status(200).json(new StandardResponse("List Created Successfully", newList, 201));
 };
@@ -71,6 +72,7 @@ export const deleteList = async (req: Request, res: Response) => {
 
 	try {
 		const space = await Space.findById(spaceId);
+
 		if (!space) {
 			throw new CustomError("Space not found", 404);
 		}
@@ -80,7 +82,7 @@ export const deleteList = async (req: Request, res: Response) => {
 			throw new CustomError("List not found in the specified space", 404);
 		}
 
-		await List.findByIdAndDelete(listId);
+		await Promise.all([list.deleteOne(), space.updateOne({ $pull: { lists: listId } })]);
 
 		res.status(200).json(new StandardResponse("List Deleted Successfully", null, 200));
 	} catch (error) {

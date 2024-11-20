@@ -68,11 +68,11 @@ export const updateWorkspace = async (req: CustomRequest, res: Response) => {
 		throw new CustomError("Workspace not found", 404);
 	}
 
-	await hasAccess(workspace, req.user?.id || "");
+	await hasAccess(workspace, req.user?.id || "", "owner");
 
 	const updated = await workspace.updateOne({ $set: updateWorkspace }, { new: true });
 
-	res.status(200).json(new StandardResponse("Updated workspace successfully", updated));
+	res.status(200).json(new StandardResponse(" Workspace updated successfully", updated));
 };
 
 export const deleteWorkspace = async (req: CustomRequest, res: Response) => {
@@ -86,11 +86,11 @@ export const deleteWorkspace = async (req: CustomRequest, res: Response) => {
 		throw new CustomError("Workspace not found", 404);
 	}
 
-	await hasAccess(workspace, req.user?.id || "");
+	await hasAccess(workspace, req.user?.id || "", "owner");
 
 	await workspace.deleteOne();
 
-	res.status(204).json(new StandardResponse("Deleted workspace successfully"));
+	res.status(204).json(new StandardResponse("Workspace deleted successfully"));
 };
 
 export const getInvitedMembers = async (req: Request, res: Response) => {
@@ -105,7 +105,7 @@ export const getInvitedMembers = async (req: Request, res: Response) => {
 
 	const pendingMembers = workspace.pendingMembers;
 
-	res.status(200).json(new StandardResponse("Fetched members successfully", { members, pendingMembers }));
+	res.status(200).json(new StandardResponse("Members fetched Successfully", { members, pendingMembers }));
 };
 
 export const acceptInvitation = async (req: CustomRequest, res: Response) => {
@@ -118,11 +118,15 @@ export const acceptInvitation = async (req: CustomRequest, res: Response) => {
 	}
 
 	const user = await User.findById(userId);
-	const member = workspace.pendingMembers.find((member) => member === user?.email);
+	if (!user) throw new CustomError("User not found", 404);
+	const member = workspace.pendingMembers.find((member) => member === user.email);
 
 	if (!member) throw new CustomError("User was not invited to the workspace or invitation already accepted", 400);
 
+	if (workspace.members.includes(user?.id)) throw new CustomError("User already a member of the workspace", 400);
+
 	workspace.members.push(user?.id);
+	workspace.pendingMembers.splice(workspace.pendingMembers.indexOf(user.email), 1);
 	await workspace.save();
 	res.status(200).json(new StandardResponse("Accepted invitation", workspace));
 };
@@ -143,8 +147,6 @@ export const inviteMember = async (req: Request, res: Response) => {
 	workspace.pendingMembers.push(email);
 	await sendInvitationEmail(email, workspace);
 	await workspace.save();
-
-	console.log(alreadyInvited);
 
 	res.status(200).json(new StandardResponse(`Invitation sent to ${email} successfully.`, { email, workspaceId: id }));
 };

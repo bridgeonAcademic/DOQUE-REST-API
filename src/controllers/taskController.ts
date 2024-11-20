@@ -5,8 +5,8 @@ import { StandardResponse } from "../utils/standardResponse";
 import { CustomError } from "../utils/error/customError";
 
 export const createTask = async (req: CustomRequest, res: Response) => {
-  const { title, description, dueDate, priority, assignedTo, listId } =
-    req.body;
+  const { title, description, dueDate, priority, assignedTo } = req.body;
+  const { listId } = req.params;
 
   const task = new Task({
     listId,
@@ -22,16 +22,18 @@ export const createTask = async (req: CustomRequest, res: Response) => {
   res.status(201).json(new StandardResponse("task created successfully", task));
 };
 
-export const getAllTasks = async (req: CustomRequest, res: Response) => {
-  const { listId } = req.params;
-  const tasks = await Task.find({ listId });
+export const getTaskById = async (req: CustomRequest, res: Response) => {
+  const { taskId } = req.params;
 
-  if (tasks.length === 0) {
-    throw new CustomError("Task retrieved succesfully", 404);
+  const task = await Task.findById(taskId);
+
+  if (!task) {
+    throw new CustomError("Task not found", 404);
   }
+
   res
     .status(200)
-    .json(new StandardResponse("Task retrieved succesfully", tasks, 200));
+    .json(new StandardResponse("Task retrieved succesfully", task, 200));
 };
 
 export const updateTask = async (req: CustomRequest, res: Response) => {
@@ -66,9 +68,13 @@ export const deleteTask = async (req: CustomRequest, res: Response) => {
 
 export const moveTask = async (req: CustomRequest, res: Response) => {
   const { taskId } = req.params;
-  const { listId } = req.body;
+  const { targetListId } = req.body;
 
-  const task = await Task.findByIdAndUpdate(taskId, { listId }, { new: true });
+  const task = await Task.findByIdAndUpdate(
+    taskId,
+    { listId: targetListId },
+    { new: true }
+  );
 
   if (!task) {
     throw new CustomError("Task not found", 404);
