@@ -13,16 +13,32 @@ export const getAllUsers = async (req: CustomRequest, res: Response) => {
 
 	const users = await User.find().select("-password");
 
-	res.status(200).json(new StandardResponse("Users retrieved successfully", users));
+	const usersWithActiveWorkspaces = await Promise.all(
+		users.map(async (user) => {
+			const activeWorkspaces = await Workspace.find({
+				members: { $in: [user._id] },
+			});
+
+			return {
+				...user.toObject(),
+				activeWorkspaces,
+			};
+		}),
+	);
+
+	res
+		.status(200)
+		.json(new StandardResponse("Users with active workspaces retrieved successfully", usersWithActiveWorkspaces));
 };
 
 export const blockUser = async (req: CustomRequest, res: Response) => {
 	const { userId } = req.params;
-	const { isBlocked } = req.query;
-	console.log("param", userId);
+	const { action } = req.query;
 
-	if (isBlocked !== "true" && isBlocked !== "false") {
-		throw new CustomError("Invalid query parameter for 'isBlocked'", 400);
+	console.log("param", userId, action);
+
+	if (action !== "block" && action !== "unblock") {
+		throw new CustomError("Invalid query parameter for 'action'", 400);
 	}
 
 	const user = await User.findById(userId);
@@ -32,19 +48,21 @@ export const blockUser = async (req: CustomRequest, res: Response) => {
 		throw new CustomError("User not found", 404);
 	}
 
-	user.isBlocked = isBlocked === "true";
+	user.isBlocked = action === "block";
 
 	await user.save();
 
-	res
-		.status(200)
-		.json(new StandardResponse(`User ${isBlocked === "true" ? "blocked" : "unblocked"} successfully`, user));
+	res.status(200).json(new StandardResponse(`User ${action === "block" ? "blocked" : "unblocked"} successfully`, user));
 };
 
 export const getAllWorkspacesWithSpaces = async (req: CustomRequest, res: Response) => {
 	if (!req.user) {
 		throw new CustomError("Unauthorized access", 401);
 	}
+
+	const { page = 1, limit = 10 } = req.query;
+
+	const skip = (Number(page) - 1) * Number(limit);
 
 	const workspacesWithSpaces = await Workspace.aggregate([
 		{
@@ -55,9 +73,24 @@ export const getAllWorkspacesWithSpaces = async (req: CustomRequest, res: Respon
 				as: "spaces",
 			},
 		},
+		{
+			$facet: {
+				data: [{ $skip: skip }, { $limit: Number(limit) }],
+				totalCount: [{ $count: "count" }],
+			},
+		},
 	]);
 
-	res.status(200).json(new StandardResponse("Workspaces with spaces retrieved successfully", workspacesWithSpaces));
+	const total = workspacesWithSpaces[0]?.totalCount[0]?.count || 0;
+
+	res.status(200).json(
+		new StandardResponse("Workspaces with spaces retrieved successfully", {
+			data: workspacesWithSpaces[0]?.data || [],
+			total,
+			page: Number(page),
+			limit: Number(limit),
+		}),
+	);
 };
 
 export const getWorkspaceById = async (req: CustomRequest, res: Response) => {
@@ -66,6 +99,7 @@ export const getWorkspaceById = async (req: CustomRequest, res: Response) => {
 	if (!req.user) {
 		throw new CustomError("Unauthorized access", 401);
 	}
+
 	const workspaceWithSpaces = await Workspace.aggregate([
 		{
 			$match: { _id: new mongoose.Types.ObjectId(workspaceId) },
@@ -83,7 +117,23 @@ export const getWorkspaceById = async (req: CustomRequest, res: Response) => {
 				from: "users",
 				localField: "members",
 				foreignField: "_id",
-				as: "memberDetails",
+				as: "members",
+				pipeline: [
+					{
+						$project: {
+							password: 0,
+							__v: 0,
+						},
+					},
+				],
+			},
+		},
+		{
+			$lookup: {
+				from: "users",
+				localField: "pendingMembers",
+				foreignField: "_id",
+				as: "pendingMembers",
 				pipeline: [
 					{
 						$project: {

@@ -37,6 +37,10 @@ const userSchema: Schema = new Schema(
 			type: String,
 			required: false,
 		},
+		status: {
+			type: String,
+			default: "active",
+		},
 		verified: {
 			type: Boolean,
 			default: false,
