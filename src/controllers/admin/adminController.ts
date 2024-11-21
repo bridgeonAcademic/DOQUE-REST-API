@@ -35,14 +35,11 @@ export const blockUser = async (req: CustomRequest, res: Response) => {
 	const { userId } = req.params;
 	const { action } = req.query;
 
-	console.log("param", userId, action);
-
 	if (action !== "block" && action !== "unblock") {
 		throw new CustomError("Invalid query parameter for 'action'", 400);
 	}
 
 	const user = await User.findById(userId);
-	console.log("find", user);
 
 	if (!user) {
 		throw new CustomError("User not found", 404);

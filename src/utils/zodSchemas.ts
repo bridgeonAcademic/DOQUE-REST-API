@@ -21,7 +21,6 @@ const otpSchema = z.object({
 const spaceSchema = z.object({
 	name: z.string().min(3),
 	description: z.string().optional(),
-	workspaceId: z.string().optional(),
 });
 
 const listSchema = z.object({

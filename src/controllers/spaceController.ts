@@ -133,8 +133,6 @@ export const getSpaceById = async (req: Request, res: Response) => {
 		{ $project: { tasks: 0 } }, // Remove the top-level tasks array
 	]);
 
-	console.log(space);
-
 	if (!space.length) {
 		throw new CustomError("Space not found");
 	}
