@@ -12,7 +12,7 @@ import listRoutes from "./routes/listRoutes";
 import taskRoutes from "./routes/taskRoutes";
 import userRoutes from "./routes/userRoutes";
 import workspaceRoutes from "./routes/workspaceRoutes";
-const app = express();
+import { app, server } from "./socket/socket";
 
 dotenv.config();
 
@@ -38,7 +38,7 @@ app.use(globalErrorHandler);
 mongoose
 	.connect(process.env.MONGO_URI || "")
 	.then(() => {
-		app.listen(port, () => {
+		server.listen(port, () => {
 			console.log(`Server is running on port ${port}`);
 		});
 	})
