@@ -2,7 +2,7 @@ import mongoose, { type Document, Schema, type Types } from "mongoose";
 
 interface IMessage {
 	content: string;
-	timestamp: Date;
+	timestamp: Date | number;
 	sender: Types.ObjectId;
 }
 
@@ -15,14 +15,14 @@ const chatSchema: Schema<IChat> = new Schema(
 	{
 		workspaceId: {
 			type: Schema.Types.ObjectId,
-			ref: "workspace",
+			ref: "Workspace",
 			required: true,
 		},
 		messages: [
 			{
 				content: { type: String, required: true },
 				timestamp: { type: Date, required: true },
-				sender: { type: Schema.Types.ObjectId, ref: "user", required: true },
+				sender: { type: Schema.Types.ObjectId, ref: "User", required: true },
 			},
 		],
 	},

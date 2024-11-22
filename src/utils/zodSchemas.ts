@@ -10,6 +10,7 @@ const registerSchema = z.object({
   lastName: z.string().optional(),
   email: z.string().email(),
   password: z.string().min(4),
+  image: z.string().optional(),
 });
 
 const otpSchema = z.object({
@@ -26,6 +27,7 @@ const listSchema = z.object({
   name: z.string().min(3, "List name must be at least 3 characters"),
   description: z.string().optional(),
   color: z.string().optional(),
+  task: z.array(z.string()).optional(),
   spaceId: z.string().optional(),
 });
 

@@ -12,7 +12,7 @@ import listRoutes from "./routes/listRoutes";
 import taskRoutes from "./routes/taskRoutes";
 import userRoutes from "./routes/userRoutes";
 import workspaceRoutes from "./routes/workspaceRoutes";
-const app = express();
+import { app, server } from "./socket/socket";
 
 dotenv.config();
 
@@ -36,6 +36,7 @@ app.use("/api/workspace", workspaceRoutes);
 app.use(globalErrorHandler);
 
 mongoose
+<<<<<<< HEAD
   .connect(process.env.MONGO_URI || "")
   .then(() => {
     app.listen(port, () => {
@@ -45,3 +46,14 @@ mongoose
   .catch((err) => {
     console.error(err);
   });
+=======
+	.connect(process.env.MONGO_URI || "")
+	.then(() => {
+		server.listen(port, () => {
+			console.log(`Server is running on port ${port}`);
+		});
+	})
+	.catch((err) => {
+		console.error(err);
+	});
+>>>>>>> 02f18bd6f0f555eb062ef1c90138785da5583f8b

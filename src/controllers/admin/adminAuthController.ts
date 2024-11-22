@@ -6,7 +6,6 @@ import { StandardResponse } from "../../utils/standardResponse";
 
 export const adminLogin = async (req: Request, res: Response) => {
 	const { email, password } = req.body;
-	console.log(email, password);
 
 	const ADMIN_KEY = process.env.ADMIN_KEY || "";
 	const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
@@ -30,11 +29,5 @@ export const adminLogin = async (req: Request, res: Response) => {
 		},
 	);
 
-	const response = {
-		email: ADMIN_KEY,
-		role: "admin",
-		token,
-	};
-
-	res.status(200).json(new StandardResponse("Admin login successful", response));
+	res.status(200).json(new StandardResponse(token));
 };
