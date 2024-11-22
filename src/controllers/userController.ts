@@ -33,3 +33,14 @@ export const updatedUserProfile = async (req: Request, res: Response) => {
 
 	res.status(200).json(new StandardResponse("User Updated successfully", updatedProfile));
 };
+
+export const getAllUsers = async (req: Request, res: Response) => {
+	const users = await User.find();
+	console.log(users);
+
+	if (!users || users.length < 1) {
+		throw new CustomError("Users not found");
+	}
+
+	res.status(200).json(new StandardResponse("User Updated successfully", users));
+};
