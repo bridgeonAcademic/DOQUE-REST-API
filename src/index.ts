@@ -12,6 +12,7 @@ import listRoutes from "./routes/listRoutes";
 import taskRoutes from "./routes/taskRoutes";
 import userRoutes from "./routes/userRoutes";
 import workspaceRoutes from "./routes/workspaceRoutes";
+import paymentRoutes from "./routes/paymentRoutes";
 const app = express();
 
 dotenv.config();
@@ -32,7 +33,7 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/userprofile", userRoutes);
 app.use("/api/workspace", workspaceRoutes);
-
+app.use("/api/payment", paymentRoutes);
 app.use(globalErrorHandler);
 
 mongoose
