@@ -13,8 +13,6 @@ export const createMessages = async (req: CustomRequest, res: Response) => {
 		throw new CustomError("Workspace not found", 400);
 	}
 
-	// console.log(workspaceId, "aaa");
-
 	const message = new Chat({
 		workspace: workspaceId,
 		messages: [
@@ -33,10 +31,8 @@ export const createMessages = async (req: CustomRequest, res: Response) => {
 
 export const getMessages = async (req: Request, res: Response) => {
 	const { workspaceId } = req.params;
-	console.log(workspaceId);
 
 	const messages = await Chat.findOne({ workspaceId: workspaceId }).populate("messages.sender");
-	console.log(messages);
 
 	if (!messages) {
 		throw new CustomError("Messages not found", 400);
