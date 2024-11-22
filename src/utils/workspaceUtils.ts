@@ -20,7 +20,7 @@ export const sendInvitationEmail = async (email: string, workspace: IWorkspace) 
 			<h2>Hello,</h2>
 			<p>You have been invited to join the workspace: <strong>${workspace.name}</strong>.</p>
 			<p>Click the link below to accept the invitation:</p>
-			<a href="${process.env.CLIENT_URL}/${workspace._id}/accept-invitation" style="padding: 10px 15px; color: white; background-color: #007bff; border-radius: 5px; text-decoration: none;">Accept Invitation</a>
+			<a href="${process.env.CLIENT_URL}/w/${workspace._id}/accept-invitation" style="padding: 10px 15px; color: white; background-color: #007bff; border-radius: 5px; text-decoration: none;">Accept Invitation</a>
 			<p>If you didn't request this invitation, please ignore this email.</p>
 			<p>Best Regards,</p>
 			<p>Team DOQUE</p>
