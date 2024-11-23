@@ -29,7 +29,7 @@ export const getActiveWorkspaces = async (req: CustomRequest, res: Response) => 
 
 	const activeWorkspaces = await Workspace.find({
 		members: { $in: [userId] },
-	});
+	}).populate("createdBy");
 
 	const pendingWorkspaces = await Workspace.find({
 		pendingMembers: { $in: [userId] },

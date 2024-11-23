@@ -10,7 +10,7 @@ import otpGenerator from "otp-generator";
 
 //Register user
 const register = async (req: Request, res: Response) => {
-	const { firstName, lastName, email, password } = req.body;
+	const { firstName, lastName, email, image, password } = req.body;
 
 	const saltRounds = Number(process.env.SALT_ROUNDS || "10");
 	const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -26,6 +26,7 @@ const register = async (req: Request, res: Response) => {
 	const user = new User({
 		firstName,
 		lastName,
+		image,
 		email,
 		password: hashedPassword,
 	});
