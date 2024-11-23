@@ -36,7 +36,6 @@ export const updatedUserProfile = async (req: Request, res: Response) => {
 
 export const getAllUsers = async (req: Request, res: Response) => {
 	const users = await User.find();
-	console.log(users);
 
 	if (!users || users.length < 1) {
 		throw new CustomError("Users not found");

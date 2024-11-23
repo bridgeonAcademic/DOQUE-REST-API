@@ -18,13 +18,9 @@ io.on("connection", async (socket) => {
 
 	socket.on("sendMessage", async (message) => {
 		try {
-			console.log("Message received:", message);
-
-			// Check if a chat already exists for the given workspaceId
 			const chat = await Chat.findOne({ workspaceId: message?.workSpaceId });
 
 			if (chat) {
-				// If chat exists, update the messages array
 				chat.messages.push({
 					content: message?.content,
 					timestamp: Date.now(),
@@ -34,10 +30,8 @@ io.on("connection", async (socket) => {
 				const updatedChat = await chat.save();
 				const populatedChat = await updatedChat.populate("messages.sender");
 
-				console.log("Chat updated:", populatedChat);
 				io.emit("receiveMessage", populatedChat);
 			} else {
-				// If no chat exists, create a new chat
 				const newChat = new Chat({
 					workspaceId: message?.workSpaceId,
 					messages: [
@@ -50,7 +44,6 @@ io.on("connection", async (socket) => {
 				});
 
 				const savedMessage = await (await newChat.save()).populate("messages.sender");
-				console.log("Message saved:", savedMessage);
 				io.emit("receiveMessage", savedMessage);
 			}
 		} catch (err) {

@@ -35,7 +35,13 @@ export const getMessages = async (req: Request, res: Response) => {
 	const messages = await Chat.findOne({ workspaceId: workspaceId }).populate("messages.sender");
 
 	if (!messages) {
-		throw new CustomError("Messages not found", 400);
+		const newChat = new Chat({
+			workspaceId: workspaceId,
+			messages: [],
+		});
+
+		res.status(200).json(new StandardResponse("Fetched messages successful", newChat));
+		return;
 	}
 
 	res.status(200).json(new StandardResponse("Fetched messages successful", messages));
