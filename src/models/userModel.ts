@@ -6,6 +6,7 @@ export interface IUser extends Document {
 	email: string;
 	image?: string;
 	password: string;
+	subscription?: string | null;
 	verified: boolean;
 	isBlocked: boolean;
 }
@@ -40,6 +41,10 @@ const userSchema: Schema = new Schema(
 		status: {
 			type: String,
 			default: "active",
+		},
+		subscription: {
+			type: String,
+			default: null,
 		},
 		verified: {
 			type: Boolean,

@@ -3,6 +3,7 @@ import { User } from "../models/userModel";
 import { StandardResponse } from "../utils/standardResponse";
 import { CustomError } from "../utils/error/customError";
 import type { CustomRequest } from "../types/interfaces";
+import Task from "../models/taskModel";
 
 export const getUserById = async (req: CustomRequest, res: Response) => {
 	const userId = req.user?.id;
@@ -34,6 +35,76 @@ export const updatedUserProfile = async (req: Request, res: Response) => {
 	res.status(200).json(new StandardResponse("User Updated successfully", updatedProfile));
 };
 
+export const taskAssignedToUser = async (req: Request, res: Response) => {
+	const { userId } = req.params;
+
+	if (!userId) {
+		throw new CustomError("User ID is required", 400);
+	}
+
+	try {
+		const tasks = await Task.find({ assignedTo: userId });
+
+		if (!tasks || tasks.length === 0) {
+			throw new CustomError("No tasks found for the specified user", 404);
+		}
+
+		const tasksWithDetails = await Task.aggregate([
+			{
+				$match: {
+					_id: { $in: tasks.map((task) => task._id) },
+				},
+			},
+			{
+				$lookup: {
+					from: "lists",
+					localField: "listId",
+					foreignField: "_id",
+					as: "listDetails",
+				},
+			},
+			{ $unwind: "$listDetails" },
+			{
+				$lookup: {
+					from: "spaces",
+					localField: "listDetails.spaceId",
+					foreignField: "_id",
+					as: "spaceDetails",
+				},
+			},
+			{ $unwind: "$spaceDetails" },
+			{
+				$project: {
+					_id: 0,
+					task: {
+						id: "$_id",
+						name: "$title",
+						priority: "$priority",
+						dueDate: "$dueDate",
+					},
+					list: {
+						id: "$listDetails._id",
+						name: "$listDetails.name",
+					},
+					space: {
+						id: "$spaceDetails._id",
+						name: "$spaceDetails.name",
+					},
+				},
+			},
+		]);
+
+		if (!tasksWithDetails || tasksWithDetails.length === 0) {
+			throw new CustomError("No tasks found with list and space details", 404);
+		}
+
+		res.status(200).json(new StandardResponse("Tasks assigned to the user retrieved successfully", tasksWithDetails));
+	} catch (error) {
+		console.error("Error retrieving tasks:", error);
+		throw new CustomError("Internal server error", 500);
+	}
+};
+
 export const getAllUsers = async (req: Request, res: Response) => {
 	const users = await User.find();
 
@@ -41,5 +112,5 @@ export const getAllUsers = async (req: Request, res: Response) => {
 		throw new CustomError("Users not found");
 	}
 
-	res.status(200).json(new StandardResponse("User Updated successfully", users));
+	res.status(200).json(new StandardResponse("User fetched successfully", users));
 };
