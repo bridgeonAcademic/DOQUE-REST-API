@@ -5,6 +5,7 @@ import { StandardResponse } from "../../utils/standardResponse";
 import type { CustomRequest } from "../../types/interfaces";
 import Workspace from "../../models/workspaceModel";
 import mongoose from "mongoose";
+import { PaymentModel } from "../../models/paymentModel";
 
 export const getAllUsers = async (req: CustomRequest, res: Response) => {
 	if (!req.user) {
@@ -148,4 +149,17 @@ export const getWorkspaceById = async (req: CustomRequest, res: Response) => {
 	}
 
 	res.status(200).json(new StandardResponse("Workspace with spaces retrieved successfully", workspaceWithSpaces[0]));
+};
+
+export const getAllSubscription = async (req: CustomRequest, res: Response) => {
+	if (!req.user) {
+		throw new CustomError("Unauthorized access", 401);
+	}
+
+	const subscription = await PaymentModel.find();
+
+	if (!subscription.length) {
+		throw new CustomError("No subscription found", 404);
+	}
+	res.status(200).json(new StandardResponse("Subscription retrieved successfully", subscription));
 };

@@ -5,6 +5,7 @@ import { adminLoginSchema } from "../../utils/zodSchemas";
 import { adminLogin } from "../../controllers/admin/adminAuthController";
 import {
 	blockUser,
+	getAllSubscription,
 	getAllUsers,
 	getAllWorkspacesWithSpaces,
 	getWorkspaceById,
@@ -18,5 +19,6 @@ router.get("/users", adminAuthenticate, errorCatch(getAllUsers));
 router.patch("/blockuser/:userId", adminAuthenticate, errorCatch(blockUser));
 router.get("/workspaces", adminAuthenticate, errorCatch(getAllWorkspacesWithSpaces));
 router.get("/workspace/:workspaceId", adminAuthenticate, errorCatch(getWorkspaceById));
+router.get("/subscription", adminAuthenticate, errorCatch(getAllSubscription));
 
 export default router;

@@ -44,7 +44,7 @@ const userSchema: Schema = new Schema(
 		},
 		subscription: {
 			type: String,
-			default: null,
+			default: "free",
 		},
 		verified: {
 			type: Boolean,
