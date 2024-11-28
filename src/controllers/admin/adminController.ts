@@ -58,7 +58,7 @@ export const getAllWorkspacesWithSpaces = async (req: CustomRequest, res: Respon
 		throw new CustomError("Unauthorized access", 401);
 	}
 
-	const { page = 1, limit = 10 } = req.query;
+	const { page = 1, limit = 12 } = req.query;
 
 	const skip = (Number(page) - 1) * Number(limit);
 
@@ -79,14 +79,13 @@ export const getAllWorkspacesWithSpaces = async (req: CustomRequest, res: Respon
 		},
 	]);
 
-	const total = workspacesWithSpaces[0]?.totalCount[0]?.count || 0;
+	const total = await Workspace.countDocuments();
 
 	res.status(200).json(
 		new StandardResponse("Workspaces with spaces retrieved successfully", {
 			data: workspacesWithSpaces[0]?.data || [],
 			total,
 			page: Number(page),
-			limit: Number(limit),
 		}),
 	);
 };
